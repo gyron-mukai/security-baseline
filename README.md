@@ -6,31 +6,18 @@ Claude Code のプラグイン（`gyron-security`）として配布する。
 ## 管理・バックアップ
 
 - Git: あり
-- リモート: GitHub `gyron-mukai/security-baseline`（private）
-- 公開: なし
-- 機密: 顧客データ・個人情報は含まない。点検手順そのものは機密ではないが、会社のセキュリティ方針を含むため private で運用する
+- リモート: GitHub `gyron-mukai/security-baseline`（public）
+- 公開: GitHub 上で public（2026-10-26 承認。メンバーが GitHub の認証・招待なしで導入でき、書き込みを保守担当だけに限れるため）
+- 機密: 顧客データ・個人情報・社内システムの情報は含まない。中身は一般的な Mac の安全設定と直し方のみ
 - 最終確認: 2026-10-26
 
 ---
 
 ## メンバー向け: 導入手順（最初の1回だけ）
 
-> [!info] 下の3つを順番に行います。分からなければ Claude Code に「security-baseline の README の導入手順を一緒にやって」と頼んでください。
+> [!info] 下の2つを順番に行います。GitHub のアカウントは不要です。分からなければ Claude に「security-baseline の README の導入手順を一緒にやって」と頼んでください。
 
-### 1. GitHub の認証（済んでいれば不要）
-ターミナルで次を実行し、表示に従ってブラウザでログインします。
-
-```
-gh auth login --hostname github.com
-```
-
-続けて次を実行します（git がこの認証を使うようにする設定）。
-
-```
-gh auth setup-git
-```
-
-### 2. プラグインの追加
+### 1. プラグインの追加
 Claude デスクトップアプリの **Code タブ**を開き、環境を「**このコンピューター**」にしたセッションで、次の2行を1行ずつ入力します（ターミナル版の Claude Code でも同じ）。
 うまくいかない場合は、入力欄横の「＋」→「Add plugins」から追加します。
 
@@ -44,7 +31,7 @@ Claude デスクトップアプリの **Code タブ**を開き、環境を「**�
 /plugin install gyron-security@gyron-internal
 ```
 
-### 3. 自動更新を ON にする
+### 2. 自動更新を ON にする
 `/plugin` と入力 → Marketplaces → `gyron-internal` を選ぶ → Enable auto-update を選ぶ。
 （これをしないと、点検項目が追加されても届きません）
 
