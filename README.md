@@ -5,11 +5,11 @@ Claude Code のプラグイン（`gyron-security`）として配布する。
 
 ## 管理・バックアップ
 
-- Git: あり（ローカルのみ）
-- リモート: なし（予定: GitHub `gyron-mukai/security-baseline`（private））
+- Git: あり
+- リモート: GitHub `gyron-mukai/security-baseline`（private）
 - 公開: なし
 - 機密: 顧客データ・個人情報は含まない。点検手順そのものは機密ではないが、会社のセキュリティ方針を含むため private で運用する
-- 最終確認: 2026-10-25
+- 最終確認: 2026-10-26
 
 ---
 
