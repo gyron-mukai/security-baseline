@@ -1,0 +1,14 @@
+{
+  "name": "gyron-internal",
+  "owner": {
+    "name": "株式会社ジャイロン"
+  },
+  "description": "株式会社ジャイロン 社内向けの Claude Code プラグイン",
+  "plugins": [
+    {
+      "name": "gyron-security",
+      "source": "./plugins/gyron-security",
+      "description": "Mac のセキュリティ最低ラインを点検し、直し方を案内する（読み取りのみ）"
+    }
+  ]
+}

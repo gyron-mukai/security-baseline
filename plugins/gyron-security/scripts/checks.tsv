@@ -1,0 +1,31 @@
+# checks.tsv — 全員共通のセキュリティ最低ライン（1行1チェック）
+# 形式: ID<TAB>重要度<TAB>分類<TAB>名前<TAB>確認コマンド
+#   重要度: 必須 = 全員が満たすべき最低ライン／推奨 = できれば満たしたい
+#   確認コマンド: zsh で実行。終了コード0かつ出力ありで合格。出力の1行目を結果欄に出す（60秒で打ち切り）
+# 守ること:
+#   - 読み取りだけ。設定を変えるコマンド・sudo・GUIを開くコマンドは書かない
+#   - パスワードや鍵などの中身を出力しない（有無・状態だけを出す）
+#   - macOS 標準コマンドだけを使う（jq・python3・brew は入っていない人がいる）
+#   - 行を足したら references/remediation.md に同じIDの直し方を足す
+
+# ---- OS の基本 ----
+os-update	必須	OS	macOS が最新（未適用のアップデートなし）	o=$(softwareupdate --list 2>&1); if echo "$o" | grep -q 'No new software available'; then echo "最新（$(sw_vers -productVersion)）"; else echo "未適用あり: $(echo "$o" | grep -m1 'Title:' | sed 's/^[[:space:]]*//')"; exit 1; fi
+auto-security-update	必須	OS	セキュリティ対応の自動インストールが有効	[ "$(defaults read /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall 2>/dev/null)" = 1 ] && [ "$(defaults read /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall 2>/dev/null)" = 1 ] && echo '有効' || { echo '無効または未設定'; exit 1; }
+filevault	必須	OS	FileVault（ディスク暗号化）が有効	fdesetup status | grep -q 'FileVault is On' && echo '有効' || { fdesetup status; exit 1; }
+sip	必須	OS	SIP（システム保護）が有効	csrutil status | grep -q 'enabled' && echo '有効' || { csrutil status; exit 1; }
+gatekeeper	必須	OS	Gatekeeper（未確認アプリの起動防止）が有効	spctl --status 2>&1 | grep -q 'assessments enabled' && echo '有効' || { spctl --status 2>&1; exit 1; }
+firewall	必須	OS	ファイアウォールが有効	/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate | grep -q 'enabled' && echo '有効' || { echo '無効'; exit 1; }
+auto-login-off	必須	OS	自動ログインが無効	defaults read /Library/Preferences/com.apple.loginwindow autoLoginUser >/dev/null 2>&1 && { echo '自動ログインが有効'; exit 1; } || echo '無効'
+screen-lock	必須	OS	スリープ・画面保護から5分以内にパスワードを要求	o=$(sysadminctl -screenLock status 2>&1); if echo "$o" | grep -q 'is immediate'; then echo 'すぐに要求'; else s=$(echo "$o" | grep -oE 'delay is [0-9]+' | grep -oE '[0-9]+'); if [ -n "$s" ] && [ "$s" -le 300 ]; then echo "${s}秒後に要求"; else echo "$(echo "$o" | grep -oE 'screenLock.*')"; exit 1; fi; fi
+remote-ports	必須	OS	遠隔操作・ファイル共有の待ち受けが外部に開いていない（22/445/548/3283/3389/5900番）	o=$(lsof -nP -iTCP -sTCP:LISTEN 2>/dev/null | awk 'NR>1 && $9 ~ /^(\*|0\.0\.0\.0|\[::\]):(22|445|548|3283|3389|5900)$/ {print $1" "$9}' | sort -u | tr '\n' ' '); [ -z "$o" ] && echo '待ち受けなし' || { echo "待ち受けあり: $o"; exit 1; }
+stealth	推奨	OS	ステルスモード（外部からの問い合わせに応答しない）が有効	/usr/libexec/ApplicationFirewall/socketfilterfw --getstealthmode | grep -qi 'is on' && echo '有効' || { echo '無効'; exit 1; }
+airplay-receiver	推奨	OS	AirPlayレシーバーの待ち受けがない（5000/7000番）	o=$(lsof -nP -iTCP -sTCP:LISTEN 2>/dev/null | awk 'NR>1 && $9 ~ /^(\*|0\.0\.0\.0|\[::\]):(5000|7000)$/ {print $1" "$9}' | sort -u | tr '\n' ' '); [ -z "$o" ] && echo '待ち受けなし' || { echo "待ち受けあり: $o"; exit 1; }
+guest-off	推奨	OS	ゲストユーザーが無効	[ "$(defaults read /Library/Preferences/com.apple.loginwindow GuestEnabled 2>/dev/null)" = 1 ] && { echo 'ゲストユーザーが有効'; exit 1; } || echo '無効'
+appstore-auto-update	推奨	OS	App Store のアプリ自動アップデートが有効	[ "$(defaults read /Library/Preferences/com.apple.commerce AutoUpdate 2>/dev/null)" = 1 ] && echo '有効' || { echo '無効または未設定'; exit 1; }
+
+# ---- バックアップ ----
+timemachine	推奨	バックアップ	Time Machine のバックアップ先が設定されている	tmutil destinationinfo 2>/dev/null | grep -q '^Name' && echo "設定あり（$(tmutil destinationinfo | grep -m1 '^Name' | sed 's/^Name *: *//')）" || { echo '未設定'; exit 1; }
+
+# ---- Claude Code ----
+claude-deny	必須	Claude Code	機密ファイルの読み取りと sudo を禁止するルールがある	f=~/.claude/settings.json; d=$(plutil -extract permissions.deny json -o - "$f" 2>/dev/null); m=""; echo "$d" | grep -q '\.env' || m="$m .env"; echo "$d" | grep -q 'id_' || m="$m SSH鍵"; echo "$d" | grep -q 'sudo' || m="$m sudo"; [ -z "$m" ] && echo 'あり' || { echo "不足:$m"; exit 1; }
+claude-no-bypass	必須	Claude Code	許可確認を全部スキップする設定になっていない	f=~/.claude/settings.json; [ "$(plutil -extract permissions.defaultMode raw -o - "$f" 2>/dev/null)" = bypassPermissions ] && { echo 'defaultMode が bypassPermissions'; exit 1; }; [ "$(plutil -extract skipDangerousModePermissionPrompt raw -o - "$f" 2>/dev/null)" = true ] && { echo 'skipDangerousModePermissionPrompt が true'; exit 1; }; echo 'なっていない'

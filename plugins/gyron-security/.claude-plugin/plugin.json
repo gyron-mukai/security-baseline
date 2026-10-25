@@ -1,0 +1,7 @@
+{
+  "name": "gyron-security",
+  "description": "Mac のセキュリティ最低ラインを点検し、直し方を案内する（読み取りのみ）",
+  "author": {
+    "name": "株式会社ジャイロン"
+  }
+}
