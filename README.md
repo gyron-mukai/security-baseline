@@ -15,13 +15,30 @@ Claude Code のプラグイン（`gyron-security`）として配布する。
 
 ## メンバー向け: 導入手順（最初の1回だけ）
 
-> [!info] 下の2つを順番に行います。GitHub のアカウントは不要です。分からなければ Claude に「security-baseline の README の導入手順を一緒にやって」と頼んでください。
+> [!info] GitHub のアカウントは不要です。
 
-### 1. プラグインの追加
-Claude デスクトップアプリの **Code タブ**を開き、環境を「**このコンピューター**」にしたセッションで、次の2行を1行ずつ入力します（ターミナル版の Claude Code でも同じ）。
-うまくいかない場合は、入力欄横の「＋」→「Add plugins」から追加します。
+> [!warning] デスクトップアプリでは `/plugin` コマンドが使えません（「/plugin isn't available in this environment.」と出ます）。下のように Claude にコマンドの実行を頼んで入れます。
 
-> [!warning] 2026-10-26 時点で、Code タブからこの2行で追加できるかは試験導入で確認中
+### デスクトップアプリの場合
+1. 上のタブを「Cowork」ではなく **Code** にする（Cowork は Mac 本体ではなく Linux の作業環境で動くため、点検できません）
+2. 新しいセッションを作り、環境は必ず「**このコンピューター**」を選ぶ（フォルダはどこでも可）
+3. 次の文章をそのまま貼って送信する
+
+```
+次のコマンドを実行して、gyron-security プラグインを入れてください。
+claude plugin install gyron-security --marketplace gyron-mukai/security-baseline
+--marketplace が使えないと言われたら、claude plugin marketplace add gyron-mukai/security-baseline を実行したあと、claude plugin install gyron-security@gyron-internal を実行してください。
+claude コマンドが見つからない場合は、~/Library/Application Support/Claude/claude-code/ の中にある claude という実行ファイルを探して使ってください。
+いまの環境が Mac ではなく Linux だと分かったら、何も実行せずにそのことを教えてください。
+入れ終わったら、新しいセッションを開くよう案内してください。
+```
+
+4. コマンドの実行を許可するか聞かれたら許可する
+5. 「コマンドライン・デベロッパツールをインストールしますか」と出たら「インストール」を押し、終わったら Claude に「続けて」と送る
+6. インストールが終わったら、新しいセッションを開く
+
+### ターミナル版の Claude Code の場合
+セッション内で次の2行を1行ずつ入力します。
 
 ```
 /plugin marketplace add gyron-mukai/security-baseline
@@ -31,15 +48,15 @@ Claude デスクトップアプリの **Code タブ**を開き、環境を「**�
 /plugin install gyron-security@gyron-internal
 ```
 
-### 2. 自動更新を ON にする
-`/plugin` と入力 → Marketplaces → `gyron-internal` を選ぶ → Enable auto-update を選ぶ。
-（これをしないと、点検項目が追加されても届きません）
+続けて `/plugin` → Marketplaces → `gyron-internal` → Enable auto-update を選ぶと、点検項目の追加が自動で届きます。
+
+> [!note] デスクトップアプリで入れた場合の自動更新の方法は確認中です。更新したときは保守担当から案内します。
 
 ## 使い方
 
 Code タブ（環境は「このコンピューター」）で「**セキュリティ点検して**」と話しかけます（`/gyron-security:check` でも可）。フォルダはどこでも構いません。
 環境を cloud にするとプラグインが読み込まれないので注意してください。
-10分ほどで終わり、結果は `~/Documents/セキュリティ点検/` に保存されます。**月に1回**行ってください。
+15分ほどで終わり（不合格の項目を直す場合はさらにかかります）、結果は `~/Documents/セキュリティ点検/` に保存されます。**月に1回**行ってください。
 
 ---
 
