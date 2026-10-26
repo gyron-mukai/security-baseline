@@ -30,7 +30,8 @@ claude plugin install gyron-security --marketplace gyron-mukai/security-baseline
 --marketplace が使えないと言われたら、claude plugin marketplace add gyron-mukai/security-baseline を実行したあと、claude plugin install gyron-security@gyron-internal を実行してください。
 claude コマンドが見つからない場合は、~/Library/Application Support/Claude/claude-code/ の中にある claude という実行ファイルを探して使ってください。
 いまの環境が Mac ではなく Linux だと分かったら、何も実行せずにそのことを教えてください。
-入れ終わったら、新しいセッションを開くよう案内してください。
+入れ終わったら、~/.claude/settings.json の extraKnownMarketplaces の gyron-internal に "autoUpdate": true を足してください（ほかの設定は消さないでください）。
+最後に、新しいセッションを開くよう案内してください。
 ```
 
 4. コマンドの実行を許可するか聞かれたら許可する
@@ -48,9 +49,9 @@ claude コマンドが見つからない場合は、~/Library/Application Suppor
 /plugin install gyron-security@gyron-internal
 ```
 
-続けて `/plugin` → Marketplaces → `gyron-internal` → Enable auto-update を選ぶと、点検項目の追加が自動で届きます。
+続けて `/plugin` → Marketplaces → `gyron-internal` → Enable auto-update を選ぶと、点検項目の追加が自動で届きます（`DISABLE_AUTOUPDATER` 等を設定している場合は `FORCE_AUTOUPDATE_PLUGINS=1` も必要）。
 
-> [!note] デスクトップアプリで入れた場合の自動更新の方法は確認中です。更新したときは保守担当から案内します。
+> [!note] 依頼文の「autoUpdate」の行で、点検項目の追加が自動で届くようになります。設定が漏れていても、毎月の点検（`plugin-auto-update`）で見つかります。
 
 ## 使い方
 

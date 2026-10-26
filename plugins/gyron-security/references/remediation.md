@@ -95,3 +95,17 @@
 ## claude-no-bypass
 - `~/.claude/settings.json` の `permissions.defaultMode` が `bypassPermissions` なら、その行を消すか `default` にする。`skipDangerousModePermissionPrompt` が `true` なら消す。どちらも本人の了承を取ってから編集する
 - 起動時に `--dangerously-skip-permissions` を付ける習慣がないかも本人に聞く（付けていたらやめてもらう）
+
+## plugin-auto-update
+- `~/.claude/settings.json` の `extraKnownMarketplaces` → `gyron-internal` の中に `"autoUpdate": true` を足す。**既存の設定を消さずに追記**し、変更内容を本人に見せて了承を取ってから編集する。書き換え後の形:
+  ```json
+  "extraKnownMarketplaces": {
+    "gyron-internal": {
+      "source": { "source": "github", "repo": "gyron-mukai/security-baseline" },
+      "autoUpdate": true
+    }
+  }
+  ```
+- `gyron-internal` の項目自体が無い場合は、上の形で `extraKnownMarketplaces` ごと足してよい（本人の了承後）
+- 結果が「env の … が自動更新を止めている」の場合は、その設定を消すか、`env` に `"FORCE_AUTOUPDATE_PLUGINS": "1"` を足す。消してよい設定かは本人に聞く（意図して入れていることがある）
+- 反映は Claude Code の次のセッションから。更新はセッション開始後、最初のメッセージから最大10分ほどで裏で取り込まれ、その次のセッションで使われる
